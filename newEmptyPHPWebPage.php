@@ -12,6 +12,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/EmptyPHPWebPage.php to 
         hello
         <?php
         // put your code here
+        include 'index.php';
         ?>
     </body>
 </html>
