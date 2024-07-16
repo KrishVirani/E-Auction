@@ -3,6 +3,9 @@
 
 
     <head>
+        <?php
+        session_start();
+        ?>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -301,11 +304,13 @@
                         <form class="login-form" method="post" action="#">
                             <div class="form-group mb-30">
                                 <label for="signup-fname"><i class="fa-solid fa-user"></i></label>
-                                <input type="text" id="signup-fname" placeholder="First Name">
+                                <input type="text" id="signup-fname" placeholder="First Name" name="txtfirstname"
+                                       <?php if (isset($_POST['txtfirstname'])) echo 'value="' . htmlspecialchars($_POST['txtfirstname']) . '"'; ?> required>
                             </div>
                             <div class="form-group mb-30">
                                 <label for="signup-lname"><i class="fa-solid fa-user"></i></label>
-                                <input type="text" id="signup-lname" placeholder="Last Name">
+                                <input type="text" id="signup-lname" placeholder="Last Name" name="txtlastname"
+                                       <?php if (isset($_POST['txtlastname'])) echo 'value="' . htmlspecialchars($_POST['txtlastname']) . '"'; ?> required>
                             </div>
 
 
@@ -313,28 +318,31 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <label for="signup-number"><i class="fa-solid fa-phone"></i></label>
-                                        <input type="tel" id="signup-number" placeholder="Mobile Number">
+                                        <input type="tel" id="signup-number" placeholder="Mobile Number" name="txtMobileNo" pattern="[0-9]{10}" maxlength="10"
+                                               <?php if (isset($_POST['txtMobileNo'])) echo 'value="' . htmlspecialchars($_POST['txtMobileNo']) . '"'; ?> required>
                                     </div>
 
 
                                     <div class="col-sm-6">
                                         <div class="form-group mb-0">
                                             <label for="signup-dob"><i class="fa-solid fa-calendar"></i></label>
-                                            <input type="date" id="signup-dob">
+                                            <input type="date" id="signup-dob" name="dob"
+                                                   <?php if (isset($_POST['dob'])) echo 'value="' . htmlspecialchars($_POST['dob']) . '"'; ?>required>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="form-group mb-30">
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <label for="signup-number"><i class="far fa-envelope"></i></label>
-                                        <input type="email" id="signup-email" placeholder="Email Address">
+                                        <input type="email" id="signup-email" placeholder="Email Address" name="txtemail"
+                                               <?php if (isset($_POST['txtemail'])) echo 'value="' . htmlspecialchars($_POST['txtemail']) . '"'; ?> required>
                                     </div>
                                     <div class="col-sm-6" id="a">
                                         <div class="form-group mb-0">
-                                            <button type="submit" class="custom-button"  name="SOTP">Send OTP</button>
+                                            <button type="submit" class="custom-button"  name="btnsend">Send OTP</button>
                                         </div>
                                     </div>
                                 </div>
@@ -348,16 +356,17 @@
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <label for="signup-number"><i class="fa-solid fa-phone"></i></label>
-                                        <input type="tel" id="txtotp" placeholder="Enter OTP">
+                                        <input type="tel" id="txtotp" placeholder="Enter OTP" name="otp" pattern="[0-9]{6}" maxlength="6"
+                                               <?php if (isset($_POST['otp'])) echo 'value="' . htmlspecialchars($_POST['otp']) . '"'; ?>>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group mb-0">
-                                            <button type="submit" class="custom-button"  name="VOTP">Varify OTP</button>
+                                            <button type="submit" class="custom-button"  name="btnvarify" >Varify OTP</button>
                                         </div>
                                     </div>
                                     <div class="col-sm-3">
                                         <div class="form-group mb-0">
-                                            <button type="submit" class="custom-button"  name="ROTP">Resend OTP</button>
+                                            <button type="submit" class="custom-button"  name="btnResend">Resend OTP</button>
                                         </div>
                                     </div>
                                 </div>
@@ -369,19 +378,21 @@
 
                             <div class="form-group mb-30">
                                 <label for="login-pass"><i class="fas fa-lock"></i></label>
-                                <input type="password" id="login-pass" placeholder="Password">
+                                <input type="password" id="login-pass" placeholder="Password" name="txtpassword"
+                                       <?php if (isset($_POST['txtpassword'])) echo 'value="' . htmlspecialchars($_POST['txtpassword']) . '"'; ?> >
                                 <span class="pass-type"><i class="fas fa-eye"></i></span>
                             </div>
                             <div class="form-group mb-30">
                                 <label for="login-pass"><i class="fas fa-lock"></i></label>
-                                <input type="password" id="login-conpass" placeholder="Conforim Password">
+                                <input type="password" id="login-conpass" placeholder="Conforim Password" name="txtconfirm_password"
+                                       <?php if (isset($_POST['txtconfirm_password'])) echo 'value="' . htmlspecialchars($_POST['txtconfirm_password']) . '"'; ?> >
                                 <span class="pass-type"><i class="fas fa-eye"></i></span>
                             </div>
                             <div class="form-group checkgroup mb-30">
                                 <input type="checkbox" name="terms" id="check"><label for="check">The Sbidu Terms of Use apply</label>
                             </div>
                             <div class="form-group mb-0">
-                                <button type="submit" class="custom-button">LOG IN</button>
+                                <button type="submit" class="custom-button"  name="btnsignup">LOG IN</button>
                             </div>
                         </form>
                     </div>
@@ -395,6 +406,311 @@
                 </div>
             </div>
         </section>
+        <?php
+
+        use PHPMailer\PHPMailer\PHPMailer;
+        use PHPMailer\PHPMailer\Exception;
+
+// Check if session is not already started before calling session_start()
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (isset($_POST['btnsend'])) {
+                sendOTP();
+            } elseif (isset($_POST['btnvarify'])) {
+                verifyOTP();
+            } elseif (isset($_POST['btnResend'])) {
+                resendOTP();
+            }
+        }
+
+        function sendOTP() {
+            if (isset($_POST['txtemail'])) {
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+
+                try {
+                    $recipient_email = $_POST['txtemail'];
+                    $otp = mt_rand(100000, 999999);
+
+                    $mail = new PHPMailer(true);
+
+                    // SMTP settings
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'hemilghori@gmail.com';
+                    $mail->Password = 'nkagldxfrrntpzuz';
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+
+                    // Sender and recipient
+                    $mail->setFrom('hemilghori@gmail.com', 'Hemil');
+                    $mail->addAddress($recipient_email);
+
+                    // Email content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Email Varification OTP';
+                    //$mail->Body = 'Your OTP is: ' . $otp;
+                    $mail->Body = '
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            .header {
+                background-color: #004f9f;
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+            }
+            .content {
+                margin-top: 20px;
+                text-align: center;
+            }
+            .footer {
+                background-color: #f4f4f4;
+                color: #666666;
+                padding: 10px;
+                text-align: center;
+                font-size: 12px;
+                border-top: 1px solid #ddd;
+            }
+            .otp-code {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>E-Auction System</h1>
+            </div>
+            <div class="content">
+                <p>Dear User,</p>
+                <p>Your One-Time Password (OTP) for email verification is:</p>
+                <div class="otp-code">' . $otp . '</div>
+                <p>Please use this OTP to verify your email address.</p>
+                <p>If you did not request this OTP, please ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>© 2024 E-Auction System. All rights reserved.</p>
+                <p><a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a></p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ';
+
+                    // Send email
+                    $mail->send();
+
+                    // Store OTP in session for verification
+                    $_SESSION['otp'] = $otp;
+                    $_SESSION['email'] = $recipient_email;
+
+                    echo '<script>alert("OTP sent successfully");</script>';
+                } catch (Exception $e) {
+                    echo '<script>alert("Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '");</script>';
+                }
+            }
+        }
+
+        function verifyOTP() {
+            if (isset($_POST['otp'])) {
+                $enteredOTP = $_POST['otp'];
+                $storedOTP = $_SESSION['otp'];
+                $email = $_SESSION['email'];
+
+                if ($enteredOTP == $storedOTP) {
+                    // OTP verification successful
+                    echo '<script>alert("OTP verification successful for email: ' . $email . '");</script>';
+                    $_SESSION['verifystatus'] = 1; // Store status in session
+                } else {
+                    // OTP verification failed
+                    echo '<script>alert("OTP verification failed. Please try again.");</script>';
+                    $_SESSION['verifystatus'] = 0; // Store status in session
+                }
+            }
+        }
+
+        function resendOTP() {
+            if (isset($_SESSION['email'])) {
+                $recipient_email = $_SESSION['email'];
+                $otp = mt_rand(100000, 999999);
+
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
+                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+
+                try {
+                    $mail = new PHPMailer(true);
+
+                    // SMTP settings
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'hemilghori@gmail.com';
+                    $mail->Password = 'nkagldxfrrntpzuz';
+                    $mail->SMTPSecure = 'tls';
+                    $mail->Port = 587;
+
+                    // Sender and recipient
+                    $mail->setFrom('hemilghori@gmail.com', 'Hemil');
+                    $mail->addAddress($recipient_email);
+
+                    // Email content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Email Varification OTP';
+                    //$mail->Body = 'Your OTP is: ' . $otp;
+                    $mail->Body = '
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f4;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                padding: 20px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+            .header {
+                background-color: #004f9f;
+                color: #ffffff;
+                padding: 10px;
+                text-align: center;
+            }
+            .content {
+                margin-top: 20px;
+                text-align: center;
+            }
+            .footer {
+                background-color: #f4f4f4;
+                color: #666666;
+                padding: 10px;
+                text-align: center;
+                font-size: 12px;
+                border-top: 1px solid #ddd;
+            }
+            .otp-code {
+                font-size: 24px;
+                font-weight: bold;
+                margin: 20px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>E-Auction System</h1>
+            </div>
+            <div class="content">
+                <p>Dear User,</p>
+                <p>Your One-Time Password (OTP) for email verification is:</p>
+                <div class="otp-code">' . $otp . '</div>
+                <p>Please use this OTP to verify your email address.</p>
+                <p>If you did not request this OTP, please ignore this email.</p>
+            </div>
+            <div class="footer">
+                <p>© 2024 E-Auction System. All rights reserved.</p>
+                <p><a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a></p>
+            </div>
+        </div>
+    </body>
+    </html>
+    ';
+
+                    // Send email
+                    $mail->send();
+
+                    // Update the session with new OTP
+                    $_SESSION['otp'] = $otp;
+
+                    echo '<script>alert("OTP resent successfully to ' . $recipient_email . '");</script>';
+                } catch (Exception $e) {
+                    echo '<script>alert("Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '");</script>';
+                }
+            } else {
+                echo '<script>alert("No email address found in session.");</script>';
+            }
+        }
+
+        if (isset($_POST['btnsignup'])) {
+            if (isset($_POST['txtpassword']) && isset($_POST['txtconfirm_password'])) {
+                $password = $_POST['txtpassword'];
+                $confirmPassword = $_POST['txtconfirm_password'];
+                $dob = $_POST['dob'];
+                $passstatus = 0;
+                $dobstatus = 0;
+
+                // Debugging messages
+                echo '<script>console.log("Checking passwords");</script>';
+
+                if ($password !== $confirmPassword) {
+                    echo '<script>alert("Passwords do not match. Please try again.");</script>';
+                } else if ($password == null and $confirmPassword == null) {
+                    echo '<script>alert("Password not valid.");</script>';
+                } else {
+                    $passstatus = 1;
+                    echo '<script>console.log("Passwords match.");</script>';
+                }
+
+                $dobDate = new DateTime($dob);
+                $now = new DateTime();
+                $age = $now->diff($dobDate)->y;
+
+                // Debugging messages
+                echo '<script>console.log("Checking age");</script>';
+
+                if ($age < 18) {
+                    echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
+                } else {
+                    $dobstatus = 1;
+                    echo '<script>console.log("Age valid.");</script>';
+                }
+
+                // Debugging messages
+                echo '<script>console.log("Checking verification status");</script>';
+
+                if ($dobstatus == 1 && $passstatus == 1 && isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 1) {
+                    echo '<script>alert("Welcome to home page");</script>';
+                    session_abort();
+                } else if (isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 0) {
+                    echo '<script>alert("First complete email verification.");</script>';
+                } else if ($dobstatus == 0) {
+                    echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
+                } else if ($passstatus == 0) {
+                    echo '<script>alert("Password not valid.");</script>';
+                }
+            }
+        }
+        ?>
         <!--============= Account Section Ends Here =============-->
 
 
