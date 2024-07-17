@@ -422,20 +422,24 @@
             } elseif (isset($_POST['btnvarify'])) {
                 verifyOTP();
             } elseif (isset($_POST['btnResend'])) {
-                resendOTP();
+                //resendOTP();
+                sendOTP();
             }
         }
 
         function sendOTP() {
             if (isset($_POST['txtemail'])) {
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\PHPMailer.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\Exception.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
 
                 try {
                     $recipient_email = $_POST['txtemail'];
-                    //$otp = mt_rand(100000, 999999);
-                    $otp = 111111;
+                    $otp = mt_rand(100000, 999999);
+//                    $otp = 111111;
 
                     $mail = new PHPMailer(true);
 
@@ -558,9 +562,12 @@
                 $recipient_email = $_SESSION['email'];
                 $otp = mt_rand(100000, 999999);
 
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
-                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
+//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\PHPMailer.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\Exception.php';
+                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
 
                 try {
                     $mail = new PHPMailer(true);
@@ -912,49 +919,49 @@
         <script src="assets/js/main.js"></script>
     </body>
     <script type="module">
-    // Import the functions you need from the SDKs you need
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-    import {getAuth ,GoogleAuthProvider , signInWithRedirect , getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-  
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyByKJ3hxiWHjKYaRJF-GDKPyBGQy8iKW6c",
-      authDomain: "e-auction-d55ef.firebaseapp.com",
-      projectId: "e-auction-d55ef",
-      storageBucket: "e-auction-d55ef.appspot.com",
-      messagingSenderId: "632262014249",
-      appId: "1:632262014249:web:b4a2b0884bfe6335603338"
-    };
-  
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider(app);
-    login.addEventListener('click',(e) =>{
-        signInWithRedirect(auth, provider);
-        getRedirectResult(auth)
-  .then((result) => {
-    // This gives you a Google Access Token. You can use it to access Google APIs.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import {getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
 
-    // The signed-in user info.
-    const user = result.user;
-    // IdP data available using getAdditionalUserInfo(result)
-    // ...
-  }).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
-  });
-    });
-  </script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyByKJ3hxiWHjKYaRJF-GDKPyBGQy8iKW6c",
+            authDomain: "e-auction-d55ef.firebaseapp.com",
+            projectId: "e-auction-d55ef",
+            storageBucket: "e-auction-d55ef.appspot.com",
+            messagingSenderId: "632262014249",
+            appId: "1:632262014249:web:b4a2b0884bfe6335603338"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider(app);
+        login.addEventListener('click', (e) => {
+            signInWithRedirect(auth, provider);
+            getRedirectResult(auth)
+                    .then((result) => {
+                        // This gives you a Google Access Token. You can use it to access Google APIs.
+                        const credential = GoogleAuthProvider.credentialFromResult(result);
+                        const token = credential.accessToken;
+
+                        // The signed-in user info.
+                        const user = result.user;
+                        // IdP data available using getAdditionalUserInfo(result)
+                        // ...
+                    }).catch((error) => {
+                // Handle Errors here.
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // The email of the user's account used.
+                const email = error.customData.email;
+                // The AuthCredential type that was used.
+                const credential = GoogleAuthProvider.credentialFromError(error);
+                // ...
+            });
+        });
+    </script>
 
 </html>
