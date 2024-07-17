@@ -295,7 +295,7 @@
                                 <a href="#0"><i class="fab fa-facebook"></i>Log in with Facebook</a>
                             </li>
                             <li>
-                                <a href="#0"><i class="fab fa-google-plus"></i>Log in with Google</a>
+                                <a href="#0" id="login"><i class="fab fa-google-plus"></i>Log in with Google</a>
                             </li>
                         </ul>
                         <div class="or">
@@ -434,7 +434,8 @@
 
                 try {
                     $recipient_email = $_POST['txtemail'];
-                    $otp = mt_rand(100000, 999999);
+                    //$otp = mt_rand(100000, 999999);
+                    $otp = 111111;
 
                     $mail = new PHPMailer(true);
 
@@ -700,6 +701,7 @@
 
                 if ($dobstatus == 1 && $passstatus == 1 && isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 1) {
                     echo '<script>alert("Welcome to home page");</script>';
+                    echo '<a href="index.php">';
                     session_abort();
                 } else if (isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 0) {
                     echo '<script>alert("First complete email verification.");</script>';
@@ -707,6 +709,8 @@
                     echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
                 } else if ($passstatus == 0) {
                     echo '<script>alert("Password not valid.");</script>';
+                } else {
+                    echo '<script>alert("Something Went Wrong");</script>';
                 }
             }
         }
@@ -907,6 +911,50 @@
         <script src="assets/js/jquery-ui.min.js"></script>
         <script src="assets/js/main.js"></script>
     </body>
+    <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import {getAuth ,GoogleAuthProvider , signInWithRedirect , getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyByKJ3hxiWHjKYaRJF-GDKPyBGQy8iKW6c",
+      authDomain: "e-auction-d55ef.firebaseapp.com",
+      projectId: "e-auction-d55ef",
+      storageBucket: "e-auction-d55ef.appspot.com",
+      messagingSenderId: "632262014249",
+      appId: "1:632262014249:web:b4a2b0884bfe6335603338"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider(app);
+    login.addEventListener('click',(e) =>{
+        signInWithRedirect(auth, provider);
+        getRedirectResult(auth)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access Google APIs.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
 
+    // The signed-in user info.
+    const user = result.user;
+    // IdP data available using getAdditionalUserInfo(result)
+    // ...
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+    // ...
+  });
+    });
+  </script>
 
 </html>
