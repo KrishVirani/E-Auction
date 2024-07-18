@@ -299,7 +299,8 @@
                         <form class="login-form" method="POST">
                             <div class="form-group mb-30">
                                 <label for="login-email"><i class="far fa-envelope"></i></label>
-                                <input type="text" id="login-email" placeholder="Email Address" name="txtemail">
+                                <input type="text" id="login-email" placeholder="Email Address" name="txtemail"
+                                       <?php if (isset($_POST['email'])) echo 'value="' . $_REQUEST['email'] . '"'; ?>>
                             </div>
                             <div class="form-group">
                                 <label for="login-pass"><i class="fas fa-lock"></i></label>
@@ -330,38 +331,39 @@
             $username = "root";
             $password = "";
             $database = "e-Auction";
-
+            
+            $email=$_POST['txtemail'];
+            $password=$_POST['txtpass'];
+            
             $c = mysqli_connect($hostname, $username, $password, $database);
-            if (!$c) {
-                echo '<script>alert("Some Went Wrong While Connecting server.");</script>';
+            $qu = "SELECT Password FROM tblusers WHERE Email='$email'";
+            $q = mysqli_query($c, $qu);
+
+            if (!$q) {
+                echo '<script>alert("Query Error: ' . mysqli_error($c) . '");</script>';
             } else {
-                echo '<script>alert("Connection Succesfully");</script>';
-                $email = $_POST['txtemail'];
-                $pass = $_POST['txtpass'];
-                $qu = "select Password from tblUser where Email='$email'";
-                if (!$qu) {
-                    echo '<script>alert("User Name not Found");</script>';
-                }
-                while ($r = mysqli_fetch_row($qu)) {
-                    $dpassword = $r[0];
-                }
-                if (password_verify($password, $dpassword)) {
-                    echo '<script>alert("Login Succesfully");</script>';
+                // Check if user with given email exists
+                if (mysqli_num_rows($q) > 0) {
+                    // Fetch the row as an associative array
+                    $row = mysqli_fetch_assoc($q);
+                    // Extract the hashed password from the fetched row
+                    $dpassword = $row['Password'];
+
+                    // Verify the entered password with the hashed password
+                    if (password_verify($password, $dpassword)) {
+                        echo '<script>alert("Login Successful");</script>';
+                    } else {
+                        echo '<script>alert("Wrong Password");</script>';
+                    }
                 } else {
-                    echo '<script>alert("Wromg Password");</script>';
+                    echo '<script>alert("User not found");</script>';
                 }
-
-                $q = mysqli_query($c, $qu);
-
-                if (!$q) {
-                    $e = mysqli_error($c);
-                    echo "<script>alert('error occur');</script>";
-                } else {
-                    echo "<script>alert('User data stored successfully.');</script>";
-                }
-
-                mysqli_close($c);
             }
+
+
+
+
+            mysqli_close($c);
         }
         ?>
         <!--============= Account Section Ends Here =============-->
