@@ -6,7 +6,7 @@
         <?php
         session_start();
         ?>
-        <meta charset="UTF-8">
+        <!--<meta charset="UTF-8">-->
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
@@ -291,7 +291,7 @@
                             <p>We're happy you're here!</p>
                         </div>
                         <ul class="login-with">
-                            
+
                             <li>
                                 <a href="#0" id="login"><i class="fab fa-google-plus"></i>Log in with Google</a>
                             </li>
@@ -299,7 +299,7 @@
                         <div class="or">
                             <span>Or</span>
                         </div>
-                        <form class="login-form" method="post" action="#">
+                        <form class="login-form" method="post" action="">
                             <div class="form-group mb-30">
                                 <label for="signup-fname"><i class="fa-solid fa-user"></i></label>
                                 <input type="text" id="signup-fname" placeholder="First Name" name="txtfirstname"
@@ -339,7 +339,7 @@
                                                <?php if (isset($_POST['txtemail'])) echo 'value="' . htmlspecialchars($_POST['txtemail']) . '"'; ?> required>
                                     </div>
                                     <div class="col-sm-6" id="a">
-                                        <div class="form-group mb-0">
+                                        <div class="form-group mb-0">   
                                             <button type="submit" class="custom-button"  name="btnsend">Send OTP</button>
                                         </div>
                                     </div>
@@ -434,7 +434,7 @@
         function sendOTP() {
             if (isset($_POST['txtemail'])) {
                 sendEmail($_POST['txtemail']);
-                $varifyemail=$_SESSION['vemail'];
+                $_SESSION['vemail'] = $_POST['txtemail'];
             }
         }
 
@@ -452,7 +452,10 @@
             require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
 
             try {
-                $otp = mt_rand(100000, 999999);
+                // $otp = mt_rand(100000, 999999);
+                $otp = 111111;
+               $timestamp =  $_SERVER["REQUEST_TIME"]; 
+               $_SESSION["TIME"]=$timestamp;
 
                 $mail = new PHPMailer(true);
 
@@ -492,9 +495,8 @@
                 $enteredOTP = $_POST['otp'];
                 $storedOTP = $_SESSION['otp'];
                 $email = $_SESSION['email'];
-                if($enteredOTP== null)
-                {
-                     echo '<script>alert("Enter OTP First");</script>';
+                if ($enteredOTP == null) {
+                    echo '<script>alert("Enter OTP First");</script>';
                 }
                 if ($enteredOTP == $storedOTP) {
                     echo '<script>alert("OTP verification successful for email: ' . $email . '");</script>';
@@ -536,15 +538,16 @@
                 }
 
                 if ($dobstatus == 1 && $passstatus == 1 && isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 1) {
-                   
-                    if($_SESSION['vemail']==$_POST['txtemail'])
-                    {
-                        echo '<script>alert("Welcome to home page");</script>';
-                        //store_data();
+
+                    if ($_SESSION['vemail'] == $_POST['txtemail']) {
+
+                        //echo '<script>alert("Welcome to home page");</script>';
                         session_destroy();
-                    }
-                    else
-                    {
+                        //$email = '22bmiit142';
+                        // header("location:sign-in.php?email=$email");
+                        //exit();
+                        store_data();
+                    } else {
                         echo '<script>alert("Chnage the Email verify the email First");</script>';
                     }
                 } else if (isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 0) {
@@ -555,7 +558,23 @@
             }
         }
 
+        // Function to handle errors and output
+        function handle_errors($buffer) {
+            // Only output the buffer if there are no errors
+            if (headers_sent()) {
+                return $buffer;
+            } else {
+                ob_end_clean();
+                return false;
+            }
+        }
+
+// Flush the output buffer
+        ob_end_flush();
+
         function store_data() {
+            ob_start();
+
             $hostname = "localhost";
             $username = "root";
             $password = "";
@@ -563,28 +582,31 @@
 
             $c = mysqli_connect($hostname, $username, $password, $database);
             if (!$c) {
-                echo '<script>alert("Some Went Wrong While Connecting server.");</script>';
+                die("Connection failed: " . mysqli_connect_error());
             } else {
-                echo '<script>alert("Connection Succesfully");</script>';
+                //echo '<script>alert("Connection Succesfully");</script>';
                 $fname = $_POST['txtfirstname'];
                 $lname = $_POST['txtlastname'];
                 $mo = $_POST['txtMobileNo'];
-               
-                $d=$_POST['dob'];
-                $date= date("Y-d-m", strtotime($d));
+
+                $d = $_POST['dob'];
+                $date = date("Y-d-m", strtotime($d));
                 $email = $_POST['txtemail'];
                 $pass = password_hash($_POST['txtpassword'], PASSWORD_DEFAULT);
-                $qu = "INSERT INTO tblUser (FirstName, LastName, MobileNo, Email, DateofBirth, Password, Role) VALUES ('$fname', '$lname', '$mo', '$email', '$date', '$pass', 'buyer')";
+                $qu = "INSERT INTO tblUsers (FirstName, LastName, MobileNo, Email, DateofBirth, Password, Role) VALUES ('$fname', '$lname', '$mo', '$email', '$date', '$pass', 'buyer')";
 
                 $q = mysqli_query($c, $qu);
 
                 if (!$q) {
                     $e = mysqli_error($c);
-                    echo "<script>alert('error occur');</script>";
+                    die("Error: " . $e);
                 } else {
-                    echo "<script>alert('User data stored successfully.');</script>";
+                    //echo "<script>alert('User data stored successfully.');</script>";
+                    //header("location:sign-in.php?email=$email");
+                   // exit();
+                   echo '<script>location.replace("sign-in.php?email='.urlencode($email).'")</script>';
                 }
-
+                ob_end_flush();
                 mysqli_close($c);
             }
         }
