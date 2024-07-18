@@ -44,6 +44,7 @@
                 echo "<script>alert('User data stored successfully.');</script>";
             }
 
+            
             mysqli_close($c);
         }
         ?>
