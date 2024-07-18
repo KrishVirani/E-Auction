@@ -291,9 +291,7 @@
                             <p>We're happy you're here!</p>
                         </div>
                         <ul class="login-with">
-                            <li>
-                                <a href="#0"><i class="fab fa-facebook"></i>Log in with Facebook</a>
-                            </li>
+                            
                             <li>
                                 <a href="#0" id="login"><i class="fab fa-google-plus"></i>Log in with Google</a>
                             </li>
@@ -379,20 +377,21 @@
                             <div class="form-group mb-30">
                                 <label for="login-pass"><i class="fas fa-lock"></i></label>
                                 <input type="password" id="login-pass" placeholder="Password" name="txtpassword"
-                                       <?php if (isset($_POST['txtpassword'])) echo 'value="' . htmlspecialchars($_POST['txtpassword']) . '"'; ?> >
-                                <span class="pass-type"><i class="fas fa-eye"></i></span>
+                                <?php if (isset($_POST['txtpassword'])) echo 'value="' . htmlspecialchars($_POST['txtpassword']) . '"'; ?> 
+                                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" >
+                                <!--<span class="pass-type"><i class="fas fa-eye"></i></span>-->
                             </div>
+
                             <div class="form-group mb-30">
                                 <label for="login-pass"><i class="fas fa-lock"></i></label>
                                 <input type="password" id="login-conpass" placeholder="Conforim Password" name="txtconfirm_password"
-                                       <?php if (isset($_POST['txtconfirm_password'])) echo 'value="' . htmlspecialchars($_POST['txtconfirm_password']) . '"'; ?> >
-                                <span class="pass-type"><i class="fas fa-eye"></i></span>
+                                <?php if (isset($_POST['txtconfirm_password'])) echo 'value="' . htmlspecialchars($_POST['txtconfirm_password']) . '"'; ?> 
+                                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters" >
+                                <!--<span class="pass-type"><i class="fas fa-eye"></i></span>-->
                             </div>
-                            <div class="form-group checkgroup mb-30">
-                                <input type="checkbox" name="terms" id="check"><label for="check">The Sbidu Terms of Use apply</label>
-                            </div>
+
                             <div class="form-group mb-0">
-                                <button type="submit" class="custom-button"  name="btnsignup">LOG IN</button>
+                                <button type="submit" class="custom-button"  name="btnsignup">Sign Up</button>
                             </div>
                         </form>
                     </div>
@@ -411,7 +410,11 @@
         use PHPMailer\PHPMailer\PHPMailer;
         use PHPMailer\PHPMailer\Exception;
 
-// Check if session is not already started before calling session_start()
+// Load environment variables
+        //require 'vendor/autoload.php';
+        //$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+        //$dotenv->load();
+
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
@@ -422,120 +425,65 @@
             } elseif (isset($_POST['btnvarify'])) {
                 verifyOTP();
             } elseif (isset($_POST['btnResend'])) {
-                //resendOTP();
-                sendOTP();
+                resendOTP();
+            } elseif (isset($_POST['btnsignup'])) {
+                signup();
             }
         }
 
         function sendOTP() {
             if (isset($_POST['txtemail'])) {
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\PHPMailer.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\Exception.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
-
-                try {
-                    $recipient_email = $_POST['txtemail'];
-                    $otp = mt_rand(100000, 999999);
-//                    $otp = 111111;
-
-                    $mail = new PHPMailer(true);
-
-                    // SMTP settings
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'hemilghori@gmail.com';
-                    $mail->Password = 'nkagldxfrrntpzuz';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
-
-                    // Sender and recipient
-                    $mail->setFrom('hemilghori@gmail.com', 'Hemil');
-                    $mail->addAddress($recipient_email);
-
-                    // Email content
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Email Varification OTP';
-                    //$mail->Body = 'Your OTP is: ' . $otp;
-                    $mail->Body = '
-    <html>
-    <head>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
-                margin: 0;
-                padding: 0;
+                sendEmail($_POST['txtemail']);
+                $varifyemail=$_SESSION['vemail'];
             }
-            .container {
-                width: 100%;
-                max-width: 600px;
-                margin: 0 auto;
-                background-color: #ffffff;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-            }
-            .header {
-                background-color: #004f9f;
-                color: #ffffff;
-                padding: 10px;
-                text-align: center;
-            }
-            .content {
-                margin-top: 20px;
-                text-align: center;
-            }
-            .footer {
-                background-color: #f4f4f4;
-                color: #666666;
-                padding: 10px;
-                text-align: center;
-                font-size: 12px;
-                border-top: 1px solid #ddd;
-            }
-            .otp-code {
-                font-size: 24px;
-                font-weight: bold;
-                margin: 20px 0;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>E-Auction System</h1>
-            </div>
-            <div class="content">
-                <p>Dear User,</p>
-                <p>Your One-Time Password (OTP) for email verification is:</p>
-                <div class="otp-code">' . $otp . '</div>
-                <p>Please use this OTP to verify your email address.</p>
-                <p>If you did not request this OTP, please ignore this email.</p>
-            </div>
-            <div class="footer">
-                <p>© 2024 E-Auction System. All rights reserved.</p>
-                <p><a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a></p>
-            </div>
-        </div>
-    </body>
-    </html>
-    ';
+        }
 
-                    // Send email
-                    $mail->send();
+        function resendOTP() {
+            if (isset($_SESSION['email'])) {
+                sendEmail($_SESSION['email']);
+            } else {
+                echo '<script>alert("No email address found in session.");</script>';
+            }
+        }
 
-                    // Store OTP in session for verification
-                    $_SESSION['otp'] = $otp;
-                    $_SESSION['email'] = $recipient_email;
+        function sendEmail($recipient_email) {
+            require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\PHPMailer.php';
+            require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\Exception.php';
+            require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
 
-                    echo '<script>alert("OTP sent successfully");</script>';
-                } catch (Exception $e) {
-                    echo '<script>alert("Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '");</script>';
-                }
+            try {
+                $otp = mt_rand(100000, 999999);
+
+                $mail = new PHPMailer(true);
+
+                // SMTP settings
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'hemilghori@gmail.com';
+                $mail->Password = 'nkagldxfrrntpzuz';
+                $mail->SMTPSecure = 'tls';
+                $mail->Port = 587;
+
+                // Sender and recipient
+                $mail->setFrom('hemilghori@gmail.com', 'E-Auction');
+                $mail->addAddress($recipient_email);
+
+                // Email content
+                $mail->isHTML(true);
+                $mail->Subject = 'Email Verification OTP';
+                $mail->Body = getEmailTemplate($otp);
+
+                // Send email
+                $mail->send();
+
+                // Store OTP in session for verification
+                $_SESSION['otp'] = $otp;
+                $_SESSION['email'] = $recipient_email;
+
+                echo '<script>alert("OTP sent successfully");</script>';
+            } catch (Exception $e) {
+                echo '<script>alert("Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '");</script>';
             }
         }
 
@@ -544,52 +492,105 @@
                 $enteredOTP = $_POST['otp'];
                 $storedOTP = $_SESSION['otp'];
                 $email = $_SESSION['email'];
-
+                if($enteredOTP== null)
+                {
+                     echo '<script>alert("Enter OTP First");</script>';
+                }
                 if ($enteredOTP == $storedOTP) {
-                    // OTP verification successful
                     echo '<script>alert("OTP verification successful for email: ' . $email . '");</script>';
-                    $_SESSION['verifystatus'] = 1; // Store status in session
+                    $_SESSION['verifystatus'] = 1;
                 } else {
-                    // OTP verification failed
                     echo '<script>alert("OTP verification failed. Please try again.");</script>';
-                    $_SESSION['verifystatus'] = 0; // Store status in session
+                    $_SESSION['verifystatus'] = 0;
                 }
             }
         }
 
-        function resendOTP() {
-            if (isset($_SESSION['email'])) {
-                $recipient_email = $_SESSION['email'];
-                $otp = mt_rand(100000, 999999);
+        function signup() {
+            if (isset($_POST['txtpassword']) && isset($_POST['txtconfirm_password'])) {
+                $password = $_POST['txtpassword'];
+                $confirmPassword = $_POST['txtconfirm_password'];
+                $dob = $_POST['dob'];
+                $passstatus = 0;
+                $dobstatus = 0;
 
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\PHPMailer.php';
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\Exception.php';
-//                require 'C:\xampp\htdocs\Practice\PHPMailer-master\src\SMTP.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\PHPMailer.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\Exception.php';
-                require 'C:\xampp\htdocs\E-Auction\PHPMailer-master\src\SMTP.php';
+                if ($password !== $confirmPassword) {
+                    echo '<script>alert("Passwords do not match. Please try again.");</script>';
+                } elseif (empty($password)) {
+                    echo '<script>alert("Password not valid.");</script>';
+                } else {
+                    $passstatus = 1;
+                }
 
-                try {
-                    $mail = new PHPMailer(true);
+                $dobDate = new DateTime($dob);
+                $now = new DateTime();
+                $age = $now->diff($dobDate)->y;
 
-                    // SMTP settings
-                    $mail->isSMTP();
-                    $mail->Host = 'smtp.gmail.com';
-                    $mail->SMTPAuth = true;
-                    $mail->Username = 'hemilghori@gmail.com';
-                    $mail->Password = 'nkagldxfrrntpzuz';
-                    $mail->SMTPSecure = 'tls';
-                    $mail->Port = 587;
+                if ($age < 18) {
+                    echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
+                } else if ($age > 100) {
+                    echo '<script>alert("Age Not Allow.");</script>';
+                    exit();
+                } else {
+                    $dobstatus = 1;
+                }
 
-                    // Sender and recipient
-                    $mail->setFrom('hemilghori@gmail.com', 'Hemil');
-                    $mail->addAddress($recipient_email);
+                if ($dobstatus == 1 && $passstatus == 1 && isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 1) {
+                   
+                    if($_SESSION['vemail']==$_POST['txtemail'])
+                    {
+                        echo '<script>alert("Welcome to home page");</script>';
+                        //store_data();
+                        session_destroy();
+                    }
+                    else
+                    {
+                        echo '<script>alert("Chnage the Email verify the email First");</script>';
+                    }
+                } else if (isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 0) {
+                    echo '<script>alert("First complete email verification.");</script>';
+                } else {
+                    echo '<script>alert("Some thing is missing.");</script>';
+                }
+            }
+        }
 
-                    // Email content
-                    $mail->isHTML(true);
-                    $mail->Subject = 'Email Varification OTP';
-                    //$mail->Body = 'Your OTP is: ' . $otp;
-                    $mail->Body = '
+        function store_data() {
+            $hostname = "localhost";
+            $username = "root";
+            $password = "";
+            $database = "e-Auction";
+
+            $c = mysqli_connect($hostname, $username, $password, $database);
+            if (!$c) {
+                echo '<script>alert("Some Went Wrong While Connecting server.");</script>';
+            } else {
+                echo '<script>alert("Connection Succesfully");</script>';
+                $fname = $_POST['txtfirstname'];
+                $lname = $_POST['txtlastname'];
+                $mo = $_POST['txtMobileNo'];
+               
+                $d=$_POST['dob'];
+                $date= date("Y-d-m", strtotime($d));
+                $email = $_POST['txtemail'];
+                $pass = password_hash($_POST['txtpassword'], PASSWORD_DEFAULT);
+                $qu = "INSERT INTO tblUser (FirstName, LastName, MobileNo, Email, DateofBirth, Password, Role) VALUES ('$fname', '$lname', '$mo', '$email', '$date', '$pass', 'buyer')";
+
+                $q = mysqli_query($c, $qu);
+
+                if (!$q) {
+                    $e = mysqli_error($c);
+                    echo "<script>alert('error occur');</script>";
+                } else {
+                    echo "<script>alert('User data stored successfully.');</script>";
+                }
+
+                mysqli_close($c);
+            }
+        }
+
+        function getEmailTemplate($otp) {
+            return '
     <html>
     <head>
         <style>
@@ -651,75 +652,7 @@
             </div>
         </div>
     </body>
-    </html>
-    ';
-
-                    // Send email
-                    $mail->send();
-
-                    // Update the session with new OTP
-                    $_SESSION['otp'] = $otp;
-
-                    echo '<script>alert("OTP resent successfully to ' . $recipient_email . '");</script>';
-                } catch (Exception $e) {
-                    echo '<script>alert("Message could not be sent. Mailer Error: ' . $mail->ErrorInfo . '");</script>';
-                }
-            } else {
-                echo '<script>alert("No email address found in session.");</script>';
-            }
-        }
-
-        if (isset($_POST['btnsignup'])) {
-            if (isset($_POST['txtpassword']) && isset($_POST['txtconfirm_password'])) {
-                $password = $_POST['txtpassword'];
-                $confirmPassword = $_POST['txtconfirm_password'];
-                $dob = $_POST['dob'];
-                $passstatus = 0;
-                $dobstatus = 0;
-
-                // Debugging messages
-                echo '<script>console.log("Checking passwords");</script>';
-
-                if ($password !== $confirmPassword) {
-                    echo '<script>alert("Passwords do not match. Please try again.");</script>';
-                } else if ($password == null and $confirmPassword == null) {
-                    echo '<script>alert("Password not valid.");</script>';
-                } else {
-                    $passstatus = 1;
-                    echo '<script>console.log("Passwords match.");</script>';
-                }
-
-                $dobDate = new DateTime($dob);
-                $now = new DateTime();
-                $age = $now->diff($dobDate)->y;
-
-                // Debugging messages
-                echo '<script>console.log("Checking age");</script>';
-
-                if ($age < 18) {
-                    echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
-                } else {
-                    $dobstatus = 1;
-                    echo '<script>console.log("Age valid.");</script>';
-                }
-
-                // Debugging messages
-                echo '<script>console.log("Checking verification status");</script>';
-
-                if ($dobstatus == 1 && $passstatus == 1 && isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 1) {
-                    echo '<script>alert("Welcome to home page");</script>';
-                    echo '<a href="index.php">';
-                    session_abort();
-                } else if (isset($_SESSION['verifystatus']) && $_SESSION['verifystatus'] == 0) {
-                    echo '<script>alert("First complete email verification.");</script>';
-                } else if ($dobstatus == 0) {
-                    echo '<script>alert("You must be at least 18 years old to sign up.");</script>';
-                } else if ($passstatus == 0) {
-                    echo '<script>alert("Password not valid.");</script>';
-                } else {
-                    echo '<script>alert("Something Went Wrong");</script>';
-                }
-            }
+    </html>';
         }
         ?>
         <!--============= Account Section Ends Here =============-->
